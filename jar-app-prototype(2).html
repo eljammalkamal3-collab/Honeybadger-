@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>جار — من يستطيع المساعدة؟</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#16a34a; --green-dark:#15803d; --green-light:#dcfce7;
+    --bg:#f6f7f9; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+    --amber:#f59e0b; --red:#ef4444; --radius:18px;
+    --shadow:0 4px 20px rgba(0,0,0,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif;}
+  body{background:linear-gradient(135deg,#e8f5ec,#f0f4f8);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .phone{width:390px;max-width:100%;height:780px;max-height:94vh;background:var(--bg);border-radius:40px;box-shadow:0 25px 60px rgba(0,0,0,.25);overflow:hidden;position:relative;display:flex;flex-direction:column;border:8px solid #111827;}
+  .statusbar{background:#111827;color:#fff;text-align:center;font-size:12px;padding:6px 0;letter-spacing:1px;}
+
+  /* Header */
+  .header{background:var(--green);color:#fff;padding:16px 18px 14px;}
+  .header .top{display:flex;justify-content:space-between;align-items:center;}
+  .header h1{font-size:22px;font-weight:800;}
+  .header .loc{font-size:12px;opacity:.9;margin-top:2px;display:flex;align-items:center;gap:4px;}
+  .bell{position:relative;background:rgba(255,255,255,.2);border:none;width:38px;height:38px;border-radius:12px;font-size:17px;cursor:pointer;}
+  .bell .dot{position:absolute;top:7px;left:8px;width:8px;height:8px;background:var(--amber);border-radius:50%;border:2px solid var(--green);}
+
+  /* Search */
+  .searchbar{padding:12px 16px;background:var(--green);padding-top:0;}
+  .searchbar input{width:100%;padding:12px 16px;border-radius:14px;border:none;outline:none;font-size:14px;background:#fff;box-shadow:var(--shadow);}
+
+  /* Chips */
+  .chips{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;scrollbar-width:none;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{padding:8px 16px;border-radius:20px;background:#fff;border:1.5px solid #e5e7eb;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;color:var(--muted);}
+  .chip.active{background:var(--green);color:#fff;border-color:var(--green);}
+
+  /* Content */
+  .content{flex:1;overflow-y:auto;padding:0 16px 90px;}
+  .content::-webkit-scrollbar{width:0;}
+  .section-title{font-size:15px;font-weight:800;margin:6px 2px 10px;color:var(--text);}
+
+  .card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;}
+  .card:active{transform:scale(.98);}
+  .card .head{display:flex;gap:10px;align-items:flex-start;}
+  .avatar{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+  .av-g{background:var(--green-light);} .av-a{background:#fef3c7;} .av-b{background:#dbeafe;} .av-p{background:#fae8ff;}
+  .card .title{font-size:15px;font-weight:700;color:var(--text);}
+  .card .meta{font-size:12px;color:var(--muted);margin-top:3px;display:flex;flex-wrap:wrap;gap:8px;}
+  .badge{display:inline-flex;align-items:center;gap:3px;background:var(--green-light);color:var(--green-dark);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;}
+  .badge.urgent{background:#fee2e2;color:var(--red);}
+  .price{font-size:16px;font-weight:800;color:var(--green);margin-right:auto;white-space:nowrap;}
+
+  /* FAB */
+  .fab{position:absolute;bottom:96px;left:16px;width:58px;height:58px;border-radius:50%;background:var(--green);color:#fff;font-size:28px;border:none;box-shadow:0 8px 20px rgba(22,163,74,.45);cursor:pointer;z-index:5;}
+
+  /* Bottom nav */
+  .navbar{position:absolute;bottom:0;right:0;left:0;background:#fff;display:flex;justify-content:space-around;padding:10px 0 14px;border-top:1px solid #eee;z-index:10;}
+  .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted);cursor:pointer;border:none;background:none;width:60px;}
+  .nav-item .ic{font-size:20px;}
+  .nav-item.active{color:var(--green);font-weight:700;}
+
+  /* Screens */
+  .screen{display:none;}
+  .screen.active{display:block;animation:fade .25s;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  /* Details */
+  .detail-hero{background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;padding:20px;border-radius:0 0 28px 28px;}
+  .detail-hero h2{font-size:19px;margin-bottom:8px;}
+  .detail-hero .stats{display:flex;gap:14px;font-size:13px;opacity:.95;}
+  .detail-body{padding:16px;}
+  .desc-box{background:#fff;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:14px;}
+  .btn{display:block;width:100%;padding:14px;border-radius:14px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .btn-primary{background:var(--green);color:#fff;box-shadow:0 6px 16px rgba(22,163,74,.35);}
+  .btn-outline{background:#fff;color:var(--green);border:2px solid var(--green);margin-top:10px;}
+
+  /* Chat */
+  .chatbox{display:flex;flex-direction:column;gap:10px;padding:16px;min-height:320px;}
+  .msg{max-width:78%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.6;}
+  .msg.me{background:var(--green);color:#fff;border-bottom-left-radius:4px;align-self:flex-start;}
+  .msg.them{background:#fff;border-bottom-right-radius:4px;align-self:flex-end;box-shadow:var(--shadow);}
+  .chat-input{display:flex;gap:8px;padding:12px 16px;background:#fff;border-top:1px solid #eee;}
+  .chat-input input{flex:1;padding:12px;border-radius:14px;border:1.5px solid #e5e7eb;outline:none;font-family:inherit;font-size:14px;}
+  .chat-input button{width:46px;border:none;border-radius:14px;background:var(--green);color:#fff;font-size:18px;cursor:pointer;}
+
+  /* Form */
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text);}
+  .form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #e5e7eb;font-family:inherit;font-size:14px;outline:none;background:#fff;}
+  .form-group textarea{resize:none;height:90px;}
+  .form-card{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+
+  /* Profile */
+  .profile-hero{background:linear-gradient(135deg,var(--green),#0d9488);color:#fff;padding:26px 20px;text-align:center;border-radius:0 0 28px 28px;}
+  .profile-hero .pavatar{width:80px;height:80px;border-radius:50%;background:#fff;font-size:40px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
+  .stars{font-size:15px;letter-spacing:2px;}
+  .stat-row{display:flex;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin:14px 0;padding:16px 0;}
+  .stat{flex:1;text-align:center;}
+  .stat b{display:block;font-size:20px;color:var(--green);}
+  .stat span{font-size:12px;color:var(--muted);}
+  .badge-list{display:flex;gap:8px;flex-wrap:wrap;}
+  .pbadge{background:var(--green-light);color:var(--green-dark);padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+
+  .empty{text-align:center;color:var(--muted);padding:50px 20px;font-size:14px;}
+  .empty .big{font-size:50px;margin-bottom:12px;}
+
+  /* Toast */
+  .toast{position:absolute;top:60px;right:50%;transform:translateX(50%) translateY(-80px);background:#111827;color:#fff;padding:12px 22px;border-radius:30px;font-size:13px;font-weight:600;transition:transform .35s;z-index:50;white-space:nowrap;}
+  .toast.show{transform:translateX(50%) translateY(0);}
+  .back{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:4px 8px;}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="statusbar">9:41</div>
+
+  <!-- ============ HOME ============ -->
+  <div class="screen active" id="home">
+    <div class="header">
+      <div class="top">
+        <div>
+          <h1>جار 👋</h1>
+          <div class="loc">📍 حي النور — الرياض</div>
+        </div>
+        <button class="bell" onclick="showToast('🔔 لديك 3 إشعارات جديدة')">🔔<span class="dot"></span></button>
+      </div>
+    </div>
+    <div class="searchbar"><input placeholder="ابحث عن خدمة... (نقل، تركيب، دروس)"></div>
+    <div class="chips">
+      <div class="chip active">الكل</div><div class="chip">🚚 نقل</div><div class="chip">🔧 تركيب</div>
+      <div class="chip">📚 دروس</div><div class="chip">🌱 حدائق</div><div class="chip">🧹 تنظيف</div>
+    </div>
+    <div class="content">
+      <div class="section-title">طلبات قريبة منك 🔥</div>
+      <div class="card" onclick="openDetail('نقل أثاث من شقة إلى أخرى','أحمد المطيري','🚚','av-g','120 ر.س','500 م','منذ 10 دقائق','عاجل')">
+        <div class="head"><div class="avatar av-g">🚚</div>
+          <div style="flex:1"><div class="title">نقل أثاث من شقة إلى أخرى</div>
+            <div class="meta">👤 أحمد المطيري ⭐4.8 &nbsp;📍 500 م &nbsp;🕐 منذ 10 دقائق <span class="badge urgent">🔴 عاجل</span></div>
+          </div><div class="price">120 ر.س</div>
+        </div>
+      </div>
+      <div class="card" onclick="openDetail('تركيب ستائر ورفوف','سارة القحطاني','🔧','av-b','60 ر.س','1.2 كم','منذ 25 دقيقة','')">
+        <div class="head"><div class="avatar av-b">🔧</div>
+          <div style="flex:1"><div class="title">تركيب ستائر ورفوف</div>
+            <div class="meta">👤 سارة القحطاني ⭐4.9 &nbsp;📍 1.2 كم &nbsp;🕐 منذ 25 دقيقة</div>
+          </div><div class="price">60 ر.س</div>
+        </div>
+      </div>
+      <div class="card" onclick="openDetail('درس رياضيات لطالب ثانوي','خالد العتيبي','📚','av-a','80 ر.س','800 م','منذ ساعة','')">
+        <div class="head"><div class="avatar av-a">📚</div>
+          <div style="flex:1"><div class="title">درس رياضيات لطالب ثانوي</div>
+            <div class="meta">👤 خالد العتيبي ⭐5.0 &nbsp;📍 800 م &nbsp;🕐 منذ ساعة <span class="badge">✓ موثّق</span></div>
+          </div><div class="price">80 ر.س</div>
+        </div>
+      </div>
+      <div class="card" onclick="openDetail('قص شجرة وتهذيب حديقة','نورة الشمري','🌱','av-p','90 ر.س','2 كم','منذ ساعتين','')">
+        <div class="head"><div class="avatar av-p">🌱</div>
+          <div style="flex:1"><div class="title">قص شجرة وتهذيب حديقة</div>
+            <div class="meta">👤 نورة الشمري ⭐4.7 &nbsp;📍 2 كم &nbsp;🕐 منذ ساعتين</div>
+          </div><div class="price">90 ر.س</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DETAIL ============ -->
+  <div class="screen" id="detail">
+    <div class="detail-hero">
+      <div style="display:flex;align-items:center;gap:8px;"><button class="back" onclick="go('home')">→</button><span style="font-size:14px;opacity:.9;">تفاصيل الطلب</span></div>
+      <h2 id="d-title"></h2>
+      <div class="stats"><span id="d-user"></span><span id="d-dist"></span><span id="d-time"></span></div>
+    </div>
+    <div class="detail-body">
+      <div class="desc-box">
+        <b style="color:var(--text)">الوصف:</b><br>
+        أحتاج المساعدة في <span id="d-desc"></span>. العمل بسيط ومتوقع إنجازه خلال ساعتين كحد أقصى. الأدوات متوفرة.
+        <br><br>💰 السعر المقترح: <b id="d-price" style="color:var(--green)"></b>
+      </div>
+      <button class="btn btn-primary" onclick="showToast('✅ تم قبول الطلب! تواصل الآن مع الطالب')">قبول الطلب 🤝</button>
+      <button class="btn btn-outline" onclick="go('chat')">💬 مراسلة الطالب</button>
+    </div>
+  </div>
+
+  <!-- ============ NEW REQUEST ============ -->
+  <div class="screen" id="new">
+    <div class="header" style="display:flex;align-items:center;gap:8px;"><button class="back" onclick="go('home')">→</button><h1 style="font-size:18px;">طلب خدمة جديد</h1></div>
+    <div class="content" style="padding-top:16px;">
+      <div class="form-card">
+        <div class="form-group"><label>عنوان الطلب</label><input id="f-title" placeholder="مثال: نقل طاولة طعام"></div>
+        <div class="form-group"><label>التصنيف</label><select><option>🚚 نقل وتوصيل</option><option>🔧 تركيب وصيانة</option><option>📚 دروس وتعليم</option><option>🌱 حدائق</option><option>🧹 تنظيف</option><option>🐱 رعاية حيوانات</option></select></div>
+        <div class="form-group"><label>الوصف</label><textarea placeholder="اشرح ما تحتاجه بالتفصيل..."></textarea></div>
+        <div class="form-group"><label>السعر المقترح (ر.س)</label><input type="number" placeholder="مثال: 100"></div>
+        <div class="form-group"><label>التوقيت المطلوب</label><select><option>اليوم</option><option>غداً</option><option>هذا الأسبوع</option></select></div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:16px;"><input type="checkbox" style="width:18px;height:18px;"> 🔴 طلب عاجل (رسوم إضافية 5 ر.س)</label>
+        <button class="btn btn-primary" onclick="submitRequest()">نشر الطلب 📢</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MY REQUESTS ============ -->
+  <div class="screen" id="myreq">
+    <div class="header"><h1 style="font-size:18px;">طلباتي</h1></div>
+    <div class="content" style="padding-top:16px;">
+      <div class="card"><div class="head"><div class="avatar av-g">🚚</div>
+        <div style="flex:1"><div class="title">نقل ثلاجة</div><div class="meta">🟡 قيد التنفيذ — 🕐 اليوم 5 مساءً</div></div><div class="price">50 ر.س</div></div></div>
+      <div class="card"><div class="head"><div class="avatar av-a">📚</div>
+        <div style="flex:1"><div class="title">درس فيزياء</div><div class="meta">✅ مكتمل — ⭐ قيّمت: 5 نجوم</div></div><div class="price">75 ر.س</div></div></div>
+      <div class="empty"><div class="big">📭</div>لا توجد طلبات أخرى</div>
+    </div>
+  </div>
+
+  <!-- ============ CHAT ============ -->
+  <div class="screen" id="chat">
+    <div class="header" style="display:flex;align-items:center;gap:8px;"><button class="back" onclick="go('home')">→</button><h1 style="font-size:17px;">💬 أحمد المطيري <span style="font-size:12px;font-weight:400;opacity:.85;">⭐4.8</span></h1></div>
+    <div class="content" style="padding:0;display:flex;flex-direction:column;">
+      <div class="chatbox" id="chatbox">
+        <div class="msg them">أهلاً! شفت طلبك عن نقل الأثاث، متى يناسبك؟</div>
+        <div class="msg me">أهلاً أحمد 🌟 اليوم بعد العصر إن أمكن</div>
+        <div class="msg them">تمام! أكون عندك 4:30. عندك سلّم متحرك ولا أجيب معي؟</div>
+        <div class="msg me">لا تقلق، كل الأدوات جاهزة 👍</div>
+      </div>
+      <div class="chat-input">
+        <input id="msgInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PROFILE ============ -->
+  <div class="screen" id="profile">
+    <div class="profile-hero">
+      <div class="pavatar">🧑</div>
+      <h2 style="font-size:20px;">عبدالله السالم</h2>
+      <div class="stars">⭐⭐⭐⭐⭐ <span style="font-size:13px;">4.9 (37 تقييم)</span></div>
+      <div style="font-size:12px;opacity:.9;margin-top:4px;">✓ هوية موثقة &nbsp;•&nbsp; عضو منذ مارس 2026</div>
+    </div>
+    <div class="content" style="padding-top:0;">
+      <div class="stat-row">
+        <div class="stat"><b>23</b><span>خدمة مكتملة</span></div>
+        <div class="stat"><b>12</b><span>طلب نشره</span></div>
+        <div class="stat"><b>98%</b><span>التزام بالمواعيد</span></div>
+      </div>
+      <div class="section-title">الأوسمة 🏆</div>
+      <div class="badge-list">
+        <span class="pbadge">🥇 مساعد ذهبي</span><span class="pbadge">⚡ سريع الاستجابة</span>
+        <span class="pbadge">🤝 موثوق</span><span class="pbadge">🌟 5 نجوم ×10</span>
+      </div>
+      <button class="btn btn-outline" style="margin-top:20px;" onclick="showToast('👤 صفحة الإعدادات (قريباً في النسخة الكاملة)')">الإعدادات ⚙️</button>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" onclick="go('new')">＋</button>
+
+  <!-- NAV -->
+  <div class="navbar">
+    <button class="nav-item active" data-s="home" onclick="nav(this)"><span class="ic">🏠</span>الرئيسية</button>
+    <button class="nav-item" data-s="myreq" onclick="nav(this)"><span class="ic">📋</span>طلباتي</button>
+    <button class="nav-item" data-s="chat" onclick="nav(this)"><span class="ic">💬</span>المحادثات</button>
+    <button class="nav-item" data-s="profile" onclick="nav(this)"><span class="ic">👤</span>حسابي</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.s===id));
+  }
+  function nav(btn){ go(btn.dataset.s); }
+  function openDetail(title,user,ic,av,price,dist,time,urgent){
+    document.getElementById('d-title').textContent = title;
+    document.getElementById('d-user').textContent = '👤 '+user;
+    document.getElementById('d-dist').textContent = '📍 '+dist;
+    document.getElementById('d-time').textContent = '🕐 '+time;
+    document.getElementById('d-price').textContent = price;
+    document.getElementById('d-desc').textContent = title.toLowerCase();
+    go('detail');
+  }
+  function submitRequest(){
+    const t = document.getElementById('f-title').value;
+    showToast(t ? '📢 تم نشر طلبك: "'+t+'"' : '📢 تم نشر طلبك بنجاح!');
+    document.getElementById('f-title').value='';
+    setTimeout(()=>go('home'),1200);
+  }
+  function sendMsg(){
+    const inp = document.getElementById('msgInput');
+    if(!inp.value.trim()) return;
+    const m = document.createElement('div'); m.className='msg me'; m.textContent=inp.value;
+    document.getElementById('chatbox').appendChild(m); inp.value='';
+    document.querySelector('#chat .content').scrollTop = 9999;
+    setTimeout(()=>{
+      const r = document.createElement('div'); r.className='msg them';
+      r.textContent = ['تمام! 👌','أوكي، منتظرك 🙌','وصلت، أفتح الباب 😄'][Math.floor(Math.random()*3)];
+      document.getElementById('chatbox').appendChild(r);
+    },900);
+  }
+  let toastTimer;
+  function showToast(txt){
+    const t = document.getElementById('toast');
+    t.textContent = txt; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>t.classList.remove('show'),2500);
+  }
+  document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+    document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+  });
+</script>
+</body>
+</html>
